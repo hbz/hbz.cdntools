@@ -1,0 +1,10 @@
+dist
+Python3
+*.egg-info
+*.pyc
+*~
+# eclipse
+.settings
+.project
+.pydevproject
+
