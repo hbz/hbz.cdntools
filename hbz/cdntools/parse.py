@@ -10,8 +10,8 @@ from urllib.parse import urlparse
 # from datetime import datetime
 
 
-#def css_filter(tag):
-#    return tag.has_attr('href')
+# def css_filter(tag):
+#     return tag.has_attr('href')
 
 IGNORE_RELS = ('dns-prefetch', 'alternate')
 
@@ -38,7 +38,7 @@ class CDN:
 
     def link(self):
         head = self.soup.head
-        #css_files = head.find_all(css_filter, type="text/css")
+        # css_files = head.find_all(css_filter, type="text/css")
         link_files = head.find_all("link")
 
         for link_file in link_files:
@@ -53,7 +53,7 @@ class CDN:
         js_files = self.soup.find_all("script")
         for js_file in js_files:
             if js_file.has_attr('src'):
-                #print(js_file)
+                # print(js_file)
                 src = js_file.attrs['src']
                 self.files.append(src)
 
@@ -73,18 +73,20 @@ def main():
     o = urlparse(args.site)
     hostname = o.netloc
 
-    for file in cdn.files:
-        o = urlparse(file)
+    for filename in cdn.files:
+        o = urlparse(filename)
+        if o.netloc is '':
+            filename = hostname + "/" + filename
         if o.netloc != hostname:
-            print(file)
+            print(filename)
         elif all:
-            print(file)
-
+            print(filename)
 
 
 if __name__ == '__main__':
 
-    url = "https://stadtarchivkoblenz.wordpress.com"
+    # url = "https://stadtarchivkoblenz.wordpress.com"
+    url = "https://www.vg-lingenfeld.de/vg_lingenfeld/Startseite/"
     cdn = CDN(url)
     cdn.link()
     cdn.js()
