@@ -93,7 +93,8 @@ def main():
 
     console = logging.StreamHandler()
     logger.addHandler(console)
-    logger.setLevel(logging.DEBUG)
+    # logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.ERROR)
 
     parser = argparse.ArgumentParser(description='CDN gathering')
     parser.add_argument('site', help='URL of website')
