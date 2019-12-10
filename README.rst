@@ -8,3 +8,83 @@ The module is installed by running:
 .. code-block:: bash
 
     $ pip install -f http://alkyoneus.hbz-nrw.de/dist hbz.cdntools
+
+Dependencies like the request and BeautifulSoup libraries are installed automatically.
+
+Usage:
+
+.. code-block:: bash
+
+    $ cdnparse -h
+    usage: cdnparse [-h] [-a] site
+
+    CDN gathering
+
+    positional arguments:
+      site        URL of website
+
+    optional arguments:
+      -h, --help  show this help message and exit
+      -a, --all   include also local css/js
+
+Together with wpull the output of the `cdnparse` command can be used to harvest
+a complete website including also external javascript or stylesheets from CDN servers.
+The following bash script wraps wpull and cdnparse together. In a first step a
+warc is created with only js and css files. Note that wpull is called non-recursive,
+each wpull call should fetch just one single file, but put in the same warc file.
+
+In the second step the actul webseite is recursively crawled and collected the warc
+from the first step.
+
+.. code-block:: bash
+
+    #!/bin/bash
+
+    SITE=$1
+    HOSTNAME=`echo $SITE | cut -d"/" -f3`
+    TIMESTAMP=`date +"%Y%m%d%H%M%S"`
+    NAME="$HOSTNAME-$TIMESTAMP"
+
+    # CDNPARSE=/opt/regal/python3/bin/cdnparse
+    CDNPARSE=cdnparse
+    # WPULL=/opt/regal/python3/bin/wpull
+    WPULL=wpull
+    cdns=`$CDNPARSE -a  $SITE`
+
+    echo "##### Gathering CSS and JS #####"
+    for cdn in $cdns
+    do
+       $WPULL --warc-file $NAME \
+              --no-check-certificate \
+              --no-robots \
+              --delete-after \
+              --tries=5 \
+              --waitretry=20 \
+              --random-wait \
+              --strip-session-id \
+              --warc-append \
+              --database $NAME.db \
+              $cdn
+    done
+
+    echo "##### Gathering site #####"
+
+    $WPULL --warc-file $NAME \
+           --recursive \
+           --tries=5 \
+           --waitretry=20 \
+           --random-wait \
+           --link-extractors=javascript,html,css \
+           --escaped-fragment \
+           --strip-session-id \
+           --no-host-directories \
+           --page-requisites \
+           --no-parent \
+           --database $NAME.db \
+           --no-check-certificate \
+           --no-directories \
+           --delete-after \
+           --convert-links  \
+           --span-hosts \
+           --hostnames="$HOSTNAME" \
+          $SITE

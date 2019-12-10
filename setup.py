@@ -2,17 +2,19 @@
 
 from setuptools import setup, find_packages
 
-__version__ = "0.0.1"
+__version__ = "0.1"
+
 
 def _read(doc):
     return open(doc, 'rb').read()
+
 
 setup(
     name="hbz.cdntools",
     version=__version__,
     author="Peter Reimer",
     author_email="reimer@hbz-nrw.de",
-    description="Creates warc archives from cdn files",
+    description="Creates a list of external and local css and js files inluded in a website.",
     long_description=_read('README.rst').decode('utf-8'),
     install_requires=[
         'setuptools',
