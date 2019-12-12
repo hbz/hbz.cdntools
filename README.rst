@@ -7,7 +7,13 @@ The module is installed by running:
 
 .. code-block:: bash
 
-    $ pip install -f http://alkyoneus.hbz-nrw.de/dist hbz.cdntools
+    $ pip install -f https://alkyoneus.hbz-nrw.de/dist hbz.cdntools
+
+Update a new version with
+
+.. code-block:: bash
+
+        $ pip install -f https://alkyoneus.hbz-nrw.de/dist -U hbz.cdntools
 
 Dependencies like the request and BeautifulSoup libraries are installed automatically.
 
@@ -16,16 +22,20 @@ Usage:
 .. code-block:: bash
 
     $ cdnparse -h
-    usage: cdnparse [-h] [-a] site
+        usage: cdnparse [-h] [-a] [-l LOGFILE] [--version] url
 
-    CDN gathering
+        CDN gathering
 
-    positional arguments:
-      site        URL of website
+        positional arguments:
+          url                   URL of website
 
-    optional arguments:
-      -h, --help  show this help message and exit
-      -a, --all   include also local css/js
+        optional arguments:
+          -h, --help            show this help message and exit
+          -a, --all             include also local css/js
+          -l LOGFILE, --logfile LOGFILE
+                                Name of the logfile (default: cdnparse.log)
+          --version             show program's version number and exit
+
 
 Together with wpull the output of the `cdnparse` command can be used to harvest
 a complete website including also external javascript or stylesheets from CDN servers.
