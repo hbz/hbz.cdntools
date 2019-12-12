@@ -6,11 +6,13 @@ import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse, urlunparse, urljoin
 import logging
+import pkg_resources
 
-logger = logging.getLogger('cdntools')
-
+version = pkg_resources.require("hbz.cdntools")[0].version
+logger = logging.getLogger('cdnparse')
 
 IGNORE_RELS = ('dns-prefetch', 'alternate', 'search', 'shortlink')
+DEFAULT_LOGFILE = "cdnparse.log"
 
 
 def rels_in_ignored_rels(rels):
@@ -29,6 +31,7 @@ class CDN:
     def __init__(self, site):
 
         self.site = urlparse(site)
+        logger.info("analyzing  %s" % site)
         self.scheme = self.site.scheme
         self.netloc = self.site.netloc
         self.path = self.site.path
@@ -91,17 +94,22 @@ class CDN:
 
 def main():
 
-    console = logging.StreamHandler()
-    logger.addHandler(console)
-    # logger.setLevel(logging.DEBUG)
-    logger.setLevel(logging.ERROR)
-
     parser = argparse.ArgumentParser(description='CDN gathering')
     parser.add_argument('site', help='URL of website')
     parser.add_argument('-a', '--all', action="store_true", help='include also local css/js')
-    args = parser.parse_args()
+    parser.add_argument('-l', '--logfile', default="cdnparse.log", help='Name of the logfile (default: %s)' % DEFAULT_LOGFILE)
+    parser.add_argument('--version', action='version', version=version)
 
+    args = parser.parse_args()
+    logfile = args.logfile
     all = args.all
+
+    logger.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
+    fh = logging.FileHandler(logfile)
+    fh.setFormatter(formatter)
+    fh.setLevel(logging.DEBUG)
+    logger.addHandler(fh)
 
     cdn = CDN(args.site)
     cdn.link()
