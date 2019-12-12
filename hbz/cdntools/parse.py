@@ -95,7 +95,7 @@ class CDN:
 def main():
 
     parser = argparse.ArgumentParser(description='CDN gathering')
-    parser.add_argument('site', help='URL of website')
+    parser.add_argument('url', help='URL of website')
     parser.add_argument('-a', '--all', action="store_true", help='include also local css/js')
     parser.add_argument('-l', '--logfile', default="cdnparse.log", help='Name of the logfile (default: %s)' % DEFAULT_LOGFILE)
     parser.add_argument('--version', action='version', version=version)
@@ -111,7 +111,7 @@ def main():
     fh.setLevel(logging.DEBUG)
     logger.addHandler(fh)
 
-    cdn = CDN(args.site)
+    cdn = CDN(args.url)
     cdn.link()
     cdn.js()
 
