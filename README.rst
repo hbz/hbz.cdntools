@@ -15,6 +15,13 @@ Update a new version with
 
         $ pip install -f https://alkyoneus.hbz-nrw.de/dist -U hbz.cdntools
 
+Under Ubuntu 14.04.  pip does not work for unknown reasons, but easy_install does:
+
+.. code-block:: bash
+
+        $ easy_install  -f https://alkyoneus.hbz-nrw.de/dist/ -U hbz.cdntools
+
+
 Dependencies like the request and BeautifulSoup libraries are installed automatically.
 
 Usage:
