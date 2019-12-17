@@ -50,8 +50,8 @@ The following bash script wraps wpull and cdnparse together. In a first step a
 warc is created with only js and css files. Note that wpull is called non-recursive,
 each wpull call should fetch just one single file, but put in the same warc file.
 
-In the second step the actul webseite is recursively crawled and collected the warc
-from the first step.
+In the second step the actual webseite is recursively crawled and collected in
+the warc from the first step.
 
 .. code-block:: bash
 
