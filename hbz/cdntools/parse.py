@@ -28,14 +28,19 @@ def rels_in_ignored_rels(rels):
 
 class CDN:
 
-    def __init__(self, site):
+    def __init__(self, url):
 
-        self.site = urlparse(site)
-        logger.info("analyzing  %s" % site)
+        logger.info("received %s" % url)
+        r = requests.get(url)
+        url_final = r.url
+        logger.info("parsing %s" % url_final)
+        self.site = urlparse(url_final)
+
+        self.url = urlparse(url)
+
         self.scheme = self.site.scheme
         self.netloc = self.site.netloc
         self.path = self.site.path
-        r = requests.get(site)
         self.soup = BeautifulSoup(r.text, features="html.parser")
         self.files = []
 
@@ -49,6 +54,8 @@ class CDN:
         if u.netloc == '':
             path = urljoin(self.path, u.path)
             url = urlunparse((self.scheme, self.netloc, path, '', '', ''))
+            r = requests.head(url)
+            logger.info("%s [HTTP %s]" % (url, r.status_code))
             return url
         else:
             return url
