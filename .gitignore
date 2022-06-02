@@ -1,5 +1,6 @@
+.vscode
+venv
 dist
-Python3
 *.egg-info
 *.pyc
 *~
