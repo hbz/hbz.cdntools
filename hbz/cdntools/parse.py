@@ -98,6 +98,18 @@ class CDN:
                 self.files.append(url)
                 logger.info("added %s to cdn files" % url)
 
+    def style(self):
+        """Return CSS files which are included via @include
+
+        everything between ( and ) ist considered an url
+        <!-- @import url(https:...css; --></style>
+        """
+        styles = self.soup.find_all("style")
+        for style in styles:
+            src = style.text.split(')')[0].split('(')[-1]
+            url = self._normalize(src)
+            self.files.append(url)
+
 
 def main():
 
@@ -121,6 +133,7 @@ def main():
     cdn = CDN(args.url)
     cdn.link()
     cdn.js()
+    cdn.style()
 
     for url in cdn.files:
         o = urlparse(url)
@@ -131,9 +144,12 @@ def main():
 if __name__ == '__main__':
 
     # url = "https://stadtarchivkoblenz.wordpress.com"
-    url = "https://www.vg-lingenfeld.de/vg_lingenfeld/Startseite/"
+    # url = "https://www.vg-lingenfeld.de/vg_lingenfeld/Startseite/"
+    url = "https://www.languageatinternet.org/"
     cdn = CDN(url)
     cdn.link()
     cdn.js()
+    cdn.style()
+
     for file in cdn.files:
         print(file)
