@@ -7,19 +7,19 @@ The module is installed by running:
 
 .. code-block:: bash
 
-    $ pip install -i https://dist.pubsys.hbz-nrw.de hbz.cdntools
+    $ pip install -f https://dist.pubsys.hbz-nrw.de hbz.cdntools
 
 Update a new version with
 
 .. code-block:: bash
 
-        $ pip install -i https://dist.pubsys.hbz-nrw.de -U hbz.cdntools
+        $ pip install -f https://dist.pubsys.hbz-nrw.de -U hbz.cdntools
 
 Under Ubuntu 14.04.  pip does not work for unknown reasons, but easy_install does:
 
 .. code-block:: bash
 
-        $ easy_install -i https://dist.pubsys.hbz-nrw.de -U hbz.cdntools
+        $ easy_install -f https://dist.pubsys.hbz-nrw.de -U hbz.cdntools
 
 
 Dependencies like the `Requests`_ and `BeautifulSoup`_ libraries are installed automatically.
