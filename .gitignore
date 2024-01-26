@@ -8,4 +8,5 @@ dist
 .settings
 .project
 .pydevproject
+cdnparse.log
 
