@@ -1,0 +1,4 @@
+setuptools
+argparse
+requests
+beautifulsoup4
