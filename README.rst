@@ -29,16 +29,21 @@ Usage:
 .. code-block:: bash
 
     $ cdnparse -h
-        usage: cdnparse [-h] [-a] [-l LOGFILE] [--version] url
+        usage: cdnparse [-h] [-a] [-k] [-c COOKIES] [-u USERAGENT] [-l LOGFILE] [--version] url
 
         CDN gathering
 
         positional arguments:
           url                   URL of website
 
-        optional arguments:
+        options:
           -h, --help            show this help message and exit
           -a, --all             include also local css/js
+          -k, --keep            keep the downloaded HTML file
+          -c COOKIES, --cookies COOKIES
+                                Cookiestring
+          -u USERAGENT, --useragent USERAGENT
+                                User Agent (default: Google Chrome)
           -l LOGFILE, --logfile LOGFILE
                                 Name of the logfile (default: cdnparse.log)
           --version             show program's version number and exit

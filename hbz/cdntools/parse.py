@@ -13,6 +13,7 @@ logger = logging.getLogger('cdnparse')
 
 IGNORE_RELS = ('dns-prefetch', 'alternate', 'search', 'shortlink')
 DEFAULT_LOGFILE = "cdnparse.log"
+DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36"
 SITE ="site.html"
 
 def rels_in_ignored_rels(rels):
@@ -28,10 +29,18 @@ def rels_in_ignored_rels(rels):
 
 class CDN:
 
-    def __init__(self, url, keep):
+    def __init__(self, url, keep, cookies, useragent):
 
         logger.info("received %s" % url)
-        r = requests.get(url)
+
+        headers = {
+            'User-Agent': useragent,
+        }
+        if cookies:
+            logger.info("Using Cookies: %s" % cookies)
+            headers['Cookies'] = cookies
+
+        r = requests.get(url, headers=headers)
         url_final = r.url
         logger.info("parsing %s" % url_final)
         if keep:
@@ -122,13 +131,14 @@ def main():
     parser.add_argument('url', help='URL of website')
     parser.add_argument('-a', '--all', action="store_true", help='include also local css/js')
     parser.add_argument('-k', '--keep', action="store_true", help='keep the downloaded HTML file')
+    parser.add_argument('-c', '--cookies', help='Cookiestring')
+    parser.add_argument('-u', '--useragent', help='User Agent (default: Google Chrome)')
     parser.add_argument('-l', '--logfile', default="cdnparse.log", help='Name of the logfile (default: %s)' % DEFAULT_LOGFILE)
     parser.add_argument('--version', action='version', version=version)
 
     args = parser.parse_args()
     logfile = args.logfile
-    keep = args.keep
-    
+        
     all = args.all
 
     logger.setLevel(logging.DEBUG)
@@ -138,7 +148,7 @@ def main():
     fh.setLevel(logging.DEBUG)
     logger.addHandler(fh)
 
-    cdn = CDN(args.url, keep=keep)
+    cdn = CDN(args.url, args.keep, args.cookies, args.useragent)
     cdn.link()
     cdn.js()
     cdn.style()
