@@ -13,7 +13,7 @@ logger = logging.getLogger('cdnparse')
 
 IGNORE_RELS = ('dns-prefetch', 'alternate', 'search', 'shortlink')
 DEFAULT_LOGFILE = "cdnparse.log"
-
+SITE ="site.html"
 
 def rels_in_ignored_rels(rels):
     """Return True if any of the rels attributes is in the IGNORE_RELS list"""
@@ -28,12 +28,17 @@ def rels_in_ignored_rels(rels):
 
 class CDN:
 
-    def __init__(self, url):
+    def __init__(self, url, keep):
 
         logger.info("received %s" % url)
         r = requests.get(url)
         url_final = r.url
         logger.info("parsing %s" % url_final)
+        if keep:
+            html = open(SITE, "w")
+            html.write(r.text)
+            logger.info("saving file as %s" % SITE)
+
         self.site = urlparse(url_final)
 
         self.url = urlparse(url)
@@ -116,11 +121,14 @@ def main():
     parser = argparse.ArgumentParser(description='CDN gathering')
     parser.add_argument('url', help='URL of website')
     parser.add_argument('-a', '--all', action="store_true", help='include also local css/js')
+    parser.add_argument('-k', '--keep', action="store_true", help='keep the downloaded HTML file')
     parser.add_argument('-l', '--logfile', default="cdnparse.log", help='Name of the logfile (default: %s)' % DEFAULT_LOGFILE)
     parser.add_argument('--version', action='version', version=version)
 
     args = parser.parse_args()
     logfile = args.logfile
+    keep = args.keep
+    
     all = args.all
 
     logger.setLevel(logging.DEBUG)
@@ -130,7 +138,7 @@ def main():
     fh.setLevel(logging.DEBUG)
     logger.addHandler(fh)
 
-    cdn = CDN(args.url)
+    cdn = CDN(args.url, keep=keep)
     cdn.link()
     cdn.js()
     cdn.style()
