@@ -1,6 +1,13 @@
 Changelog
 =========
 
+hbz.cdntools 0.5 (2024-07-01)
+-----------------------------
+
+* new flag to specify cookies and user agent
+* collect external Domains in hostnames.txt
+
+
 hbz.cdntools 0.4 (2024-01-26)
 -----------------------------
 
