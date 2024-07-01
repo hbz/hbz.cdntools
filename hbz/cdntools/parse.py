@@ -13,6 +13,7 @@ logger = logging.getLogger('cdnparse')
 
 IGNORE_RELS = ('dns-prefetch', 'alternate', 'search', 'shortlink')
 DEFAULT_LOGFILE = "cdnparse.log"
+HOSTNAMES_FILE = "hostnames.txt"
 DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36"
 SITE ="site.html"
 
@@ -124,6 +125,30 @@ class CDN:
             url = self._normalize(src)
             self.files.append(url)
 
+    def img(self):
+        """Extract external hostnames von img tags and collect them in a separate file.
+        """
+        imgs = self.soup.find_all("img")
+        hostnames = []
+        for img in imgs:
+            if img.has_attr('src'):
+                src = img.attrs['src']
+                url = urlparse(src)
+                logger.info("found %s" % src)
+                if url.netloc:
+                    if url.netloc not in hostnames and url.netloc != self.netloc:
+                        logger.info("added %s to hostnames" % url.netloc)
+                        hostnames.append(url.netloc)
+        
+        if hostnames:
+            logger.info("writing additional hostnames to %s" % HOSTNAMES_FILE)
+            with open(HOSTNAMES_FILE, "a") as f:
+                for hostname in hostnames:
+                    f.write(hostname + "\n")
+        else:
+            logger.info("no additional hostnames found")
+        
+
 
 def main():
 
@@ -152,6 +177,7 @@ def main():
     cdn.link()
     cdn.js()
     cdn.style()
+    cdn.img()
 
     for url in cdn.files:
         o = urlparse(url)
@@ -163,11 +189,14 @@ if __name__ == '__main__':
 
     # url = "https://stadtarchivkoblenz.wordpress.com"
     # url = "https://www.vg-lingenfeld.de/vg_lingenfeld/Startseite/"
-    url = "https://www.languageatinternet.org/"
+    # url = "https://www.languageatinternet.org/"
+    url = "https://www.buendnis-speyer.de/"
+
     cdn = CDN(url)
     cdn.link()
     cdn.js()
     cdn.style()
+    cdn.img()
 
     for file in cdn.files:
         print(file)

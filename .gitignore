@@ -10,3 +10,4 @@ dist
 .pydevproject
 cdnparse.log
 site.html
+hostnames.txt
