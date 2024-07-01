@@ -2,7 +2,7 @@ hbz.cdntools
 ============
 
 This tool parses a HTML site and returns a list of found CSS and JS files from external Content Delivery Networks (CDN).
-In addition <img> Tags are scanned for more Domaine and collected in a file `hostnames.txt`. 
+In addition <img> Tags are scanned for more Domains and collected in a file `hostnames.txt`. 
 
 The module is installed by running:
 
