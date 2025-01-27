@@ -180,7 +180,7 @@ class CDN:
         
         if hostnames:
             logger.info("writing additional hostnames to %s" % HOSTNAMES_FILE)
-            with open(HOSTNAMES_FILE, "a") as f:
+            with open(HOSTNAMES_FILE, "w") as f:
                 for hostname in hostnames:
                     f.write(hostname + "\n")
         else:
