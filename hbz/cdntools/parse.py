@@ -32,10 +32,9 @@ def rels_in_ignored_rels(rels):
 
 class CDN:
 
-    def __init__(self, url, keep, cookies, useragent):
+    def __init__(self, url, keep, cookies, useragent, no_check_certificate):
 
         logger.info("received %s" % url)
-
         headers = {
             'User-Agent': useragent,
         }
@@ -43,7 +42,12 @@ class CDN:
             logger.info("Using Cookies: %s" % cookies)
             headers['Cookies'] = cookies
 
-        r = requests.get(url, headers=headers)
+        if no_check_certificate:
+            self.ssl_verify=False
+        else:
+            self.ssl_verify=True
+
+        r = requests.get(url, headers=headers, verify=self.ssl_verify)
         url_final = r.url
         logger.info("parsing %s" % url_final)
         if keep:
@@ -77,7 +81,11 @@ class CDN:
         CSS files may contain links to background images. Since we crawl unrecursivley
         we have to find them manually and put them in the cdn.txt
         """
-        response = requests.get(css_address)
+        if not self.is_valid_url(css_address):
+            logger.warning(f"Invalid URL: {css_address}")
+            return None
+
+        response = requests.get(css_address, verify=self.ssl_verify)
         
         if response.status_code == 200:
             css_content = response.text
@@ -194,6 +202,7 @@ def main():
     parser.add_argument('url', help='URL of website')
     parser.add_argument('-a', '--all', action="store_true", help='include also local css/js')
     parser.add_argument('-k', '--keep', action="store_true", help='keep the downloaded HTML file')
+    parser.add_argument('-n', '--no-check-certificate', action="store_true", help='do not validate SSL certificates')
     parser.add_argument('-c', '--cookies', help='Cookiestring')
     parser.add_argument('-u', '--useragent', help='User Agent (default: Google Chrome)')
     parser.add_argument('-l', '--logfile', default="cdnparse.log", help='Name of the logfile (default: %s)' % DEFAULT_LOGFILE)
@@ -203,7 +212,7 @@ def main():
     logfile = args.logfile
         
     all = args.all
-
+    
     logger.setLevel(logging.DEBUG)
     formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
     fh = logging.FileHandler(logfile)
@@ -211,7 +220,7 @@ def main():
     fh.setLevel(logging.DEBUG)
     logger.addHandler(fh)
 
-    cdn = CDN(args.url, args.keep, args.cookies, args.useragent)
+    cdn = CDN(args.url, args.keep, args.cookies, args.useragent, args.no_check_certificate)
     cdn.link()
     cdn.js()
     cdn.style()
