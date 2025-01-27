@@ -1,6 +1,13 @@
 Changelog
 =========
 
+hbz.cdntools 0.6 (2025-01-27)
+-----------------------------
+
+* extract image urls etc from stylesheets
+* new flag to ignore invalid SSL certificates: `-n, --no-check-certificate`
+* fix: hostnames no longer appended to hostname.txt for subsequent crawls
+
 hbz.cdntools 0.5 (2024-07-01)
 -----------------------------
 

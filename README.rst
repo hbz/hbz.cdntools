@@ -2,7 +2,7 @@ hbz.cdntools
 ============
 
 This tool parses a HTML site and returns a list of found CSS and JS files from external Content Delivery Networks (CDN).
-In addition <img> Tags are scanned for more Domaine and collected in a file `hostnames.txt`. 
+In addition <img> Tags are scanned for more Domains and collected in a file `hostnames.txt`. 
 
 The module is installed by running:
 
@@ -30,17 +30,22 @@ Usage:
 .. code-block:: bash
 
     $ cdnparse -h
-        usage: cdnparse [-h] [-a] [-k] [-c COOKIES] [-u USERAGENT] [-l LOGFILE] [--version] url
+
+        usage: cdnparse [-h] [-a] [-k] [-n] [-c COOKIES] [-u USERAGENT] [-l LOGFILE]
+                        [--version]
+                        url
 
         CDN gathering
 
         positional arguments:
           url                   URL of website
 
-        options:
+        optional arguments:
           -h, --help            show this help message and exit
           -a, --all             include also local css/js
           -k, --keep            keep the downloaded HTML file
+          -n, --no-check-certificate
+                                do not validate SSL certificates
           -c COOKIES, --cookies COOKIES
                                 Cookiestring
           -u USERAGENT, --useragent USERAGENT
