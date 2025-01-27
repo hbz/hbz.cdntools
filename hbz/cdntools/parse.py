@@ -3,6 +3,7 @@
 
 import argparse
 import requests
+import re
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse, urlunparse, urljoin
 import logging
@@ -26,6 +27,7 @@ def rels_in_ignored_rels(rels):
             result = True
             break
     return result
+
 
 
 class CDN:
@@ -58,6 +60,40 @@ class CDN:
         self.path = self.site.path
         self.soup = BeautifulSoup(r.text, features="html.parser")
         self.files = []
+
+    def is_valid_url(self, url):
+        """Return True if string is a valid url
+        
+        Valid URLs have a scheme and a netloc (Domain). Sometimes css
+        backgrounds only contain file names
+        """
+        result = urlparse(url)
+        return all([result.scheme, result.netloc])
+
+
+    def extract_urls_from_css(self, css_address):
+        """Return URL found in stylesheets
+
+        CSS files may contain links to background images. Since we crawl unrecursivley
+        we have to find them manually and put them in the cdn.txt
+        """
+        response = requests.get(css_address)
+        
+        if response.status_code == 200:
+            css_content = response.text
+            # This regex matches URLs inside url() functions
+            pattern = r'url\((.*?)\)'
+            urls = re.findall(pattern, css_content)
+        else:
+            logger.warning(f"Failed to retrieve the CSS file. Status code: {response.status_code}")
+            urls = []
+
+        for url in urls:
+            url = url.strip('"\'')
+            if not self.is_valid_url(url):
+                url = urlunparse((self.scheme, self.netloc, url, '', '', ''))
+            if url not in  self.files:
+                self.files.append(url)
 
     def _normalize(self, url):
         """Return full url with hostname of given url.
@@ -95,6 +131,7 @@ class CDN:
                     url = self._normalize(href)
                     self.files.append(url)
                     logger.info("added %s to cdn files [rel=%s]" % (url, ' '.join(rel)))
+                    self.extract_urls_from_css(url)
                 else:
                     logger.info("ignored %s [rel=%s]" % (href, ' '.join(rel)))
 
@@ -123,10 +160,11 @@ class CDN:
         for style in styles:
             src = style.text.split(')')[0].split('(')[-1]
             url = self._normalize(src)
+            self.extract_urls_from_css(url)
             self.files.append(url)
 
     def img(self):
-        """Extract external hostnames von img tags and collect them in a separate file.
+        """Extract external hostnames of img tags and collect them in a separate file.
         """
         imgs = self.soup.find_all("img")
         hostnames = []
@@ -190,13 +228,14 @@ if __name__ == '__main__':
     # url = "https://stadtarchivkoblenz.wordpress.com"
     # url = "https://www.vg-lingenfeld.de/vg_lingenfeld/Startseite/"
     # url = "https://www.languageatinternet.org/"
-    url = "https://www.buendnis-speyer.de/"
+    url = "https://www.archimaera.de"
 
-    cdn = CDN(url)
-    cdn.link()
-    cdn.js()
-    cdn.style()
-    cdn.img()
-
+    cdn = CDN(url, "-k", "keks", "me")
+    #cdn.link()
+    #cdn.js()
+    #cdn.style()
+    #cdn.img()
+    u = cdn.extract_urls_from_css("https://www.afrikanistik-aegyptologie-online.de/portal_css/DiPPThemeNG/ploneStyles5838.css")
+    print(u)
     for file in cdn.files:
         print(file)
