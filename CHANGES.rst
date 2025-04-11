@@ -1,6 +1,11 @@
 Changelog
 =========
 
+hbz.cdntools 0.7 (2025-04-11)
+-----------------------------
+
+* Domains from link with rel dns-prefetch or preconnect considered as external --hostname
+
 hbz.cdntools 0.6 (2025-01-27)
 -----------------------------
 
