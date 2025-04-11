@@ -12,7 +12,8 @@ import pkg_resources
 version = pkg_resources.require("hbz.cdntools")[0].version
 logger = logging.getLogger('cdnparse')
 
-IGNORE_RELS = ('dns-prefetch', 'alternate', 'search', 'shortlink')
+# link with following rels are not added to the precrawl list but to the hostnames
+IGNORE_RELS = ('dns-prefetch', 'preconnect', 'alternate', 'search', 'shortlink')
 DEFAULT_LOGFILE = "cdnparse.log"
 HOSTNAMES_FILE = "hostnames.txt"
 DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36"
@@ -171,8 +172,9 @@ class CDN:
             self.extract_urls_from_css(url)
             self.files.append(url)
 
-    def img(self):
-        """Extract external hostnames of img tags and collect them in a separate file.
+    def hostname(self):
+        """Extract external hostnames von img tags in the body and link tags in the head
+           and collect them in a separate file.
         """
         imgs = self.soup.find_all("img")
         hostnames = []
@@ -185,7 +187,21 @@ class CDN:
                     if url.netloc not in hostnames and url.netloc != self.netloc:
                         logger.info("added %s to hostnames" % url.netloc)
                         hostnames.append(url.netloc)
-        
+
+        head = self.soup.head
+        link_files = head.find_all("link")
+
+        for link_file in link_files:
+            if link_file.has_attr('href'):
+                href = link_file.attrs['href']
+                logger.info("found %s" % href)
+                rel = link_file.attrs.get('rel', []) # rel is a list
+                if rels_in_ignored_rels(rel):
+                    url = urlparse(self._normalize(href))
+                    if url.netloc:
+                        if url.netloc not in hostnames and url.netloc != self.netloc:
+                            logger.info("added %s to hostnames" % url.netloc)
+                            hostnames.append(url.netloc)
         if hostnames:
             logger.info("writing additional hostnames to %s" % HOSTNAMES_FILE)
             with open(HOSTNAMES_FILE, "w") as f:
@@ -224,7 +240,7 @@ def main():
     cdn.link()
     cdn.js()
     cdn.style()
-    cdn.img()
+    cdn.hostname()
 
     for url in cdn.files:
         o = urlparse(url)
@@ -237,13 +253,13 @@ if __name__ == '__main__':
     # url = "https://stadtarchivkoblenz.wordpress.com"
     # url = "https://www.vg-lingenfeld.de/vg_lingenfeld/Startseite/"
     # url = "https://www.languageatinternet.org/"
-    url = "https://www.archimaera.de"
+    url = "https://www.xella.com/"
 
-    cdn = CDN(url, "-k", "keks", "me")
-    #cdn.link()
+    cdn = CDN(url, False, False, DEFAULT_USER_AGENT, False)
+    #cdin.link()
     #cdn.js()
     #cdn.style()
-    #cdn.img()
+    #cdn.hostame()
     u = cdn.extract_urls_from_css("https://www.afrikanistik-aegyptologie-online.de/portal_css/DiPPThemeNG/ploneStyles5838.css")
     print(u)
     for file in cdn.files:
