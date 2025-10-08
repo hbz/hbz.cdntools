@@ -167,10 +167,12 @@ class CDN:
         """
         styles = self.soup.find_all("style")
         for style in styles:
-            src = style.text.split(')')[0].split('(')[-1]
-            url = self._normalize(src)
-            self.extract_urls_from_css(url)
-            self.files.append(url)
+            if "@import" in style.text.lower():
+                src = style.text.split(')')[0].split('(')[-1]
+                url = self._normalize(src)
+                self.extract_urls_from_css(url)
+                valid = self.is_valid_url(url)
+                self.files.append(url)
 
     def hostname(self):
         """Extract external hostnames von img tags in the body and link tags in the head
