@@ -1,6 +1,11 @@
 Changelog
 =========
 
+hbz.cdntools 0.8 (2025-10-08)
+-----------------------------
+
+* make sure style contains "@import" before extracting further urls
+
 hbz.cdntools 0.7 (2025-04-11)
 -----------------------------
 
