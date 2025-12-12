@@ -4,6 +4,7 @@
 import argparse
 import requests
 import re
+import time
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse, urlunparse, urljoin
 import logging
@@ -33,22 +34,23 @@ def rels_in_ignored_rels(rels):
 
 class CDN:
 
-    def __init__(self, url, keep, cookies, useragent, no_check_certificate):
+    def __init__(self, url, keep, cookies, useragent, no_check_certificate, wait):
 
         logger.info("received %s" % url)
-        headers = {
+        self.headers = {
             'User-Agent': useragent,
         }
+        self.wait=wait
         if cookies:
             logger.info("Using Cookies: %s" % cookies)
-            headers['Cookies'] = cookies
+            self.headers['Cookies'] = cookies
 
         if no_check_certificate:
             self.ssl_verify=False
         else:
             self.ssl_verify=True
 
-        r = requests.get(url, headers=headers, verify=self.ssl_verify)
+        r = requests.get(url, headers=self.headers, verify=self.ssl_verify)
         url_final = r.url
         logger.info("parsing %s" % url_final)
         if keep:
@@ -86,7 +88,7 @@ class CDN:
             logger.warning(f"Invalid URL: {css_address}")
             return None
 
-        response = requests.get(css_address, verify=self.ssl_verify)
+        response = requests.get(css_address, headers=self.headers, verify=self.ssl_verify)
         
         if response.status_code == 200:
             css_content = response.text
@@ -114,7 +116,7 @@ class CDN:
         if u.netloc == '':
             path = urljoin(self.path, u.path)
             url = urlunparse((self.scheme, self.netloc, path, '', '', ''))
-            r = requests.head(url)
+            r = requests.head(url,  headers=self.headers, verify=self.ssl_verify)
             logger.info("%s [HTTP %s]" % (url, r.status_code))
             return url
         else:
@@ -143,6 +145,7 @@ class CDN:
                     self.extract_urls_from_css(url)
                 else:
                     logger.info("ignored %s [rel=%s]" % (href, ' '.join(rel)))
+            time.sleep(self.wait)
 
     def js(self):
         """Return all JS files in head and body.
@@ -223,6 +226,7 @@ def main():
     parser.add_argument('-n', '--no-check-certificate', action="store_true", help='do not validate SSL certificates')
     parser.add_argument('-c', '--cookies', help='Cookiestring')
     parser.add_argument('-u', '--useragent', help='User Agent (default: Google Chrome)')
+    parser.add_argument('-w', '--wait', type=int, default=0, help='wait SECONDS seconds between requests')
     parser.add_argument('-l', '--logfile', default="cdnparse.log", help='Name of the logfile (default: %s)' % DEFAULT_LOGFILE)
     parser.add_argument('--version', action='version', version=version)
 
@@ -238,7 +242,7 @@ def main():
     fh.setLevel(logging.DEBUG)
     logger.addHandler(fh)
 
-    cdn = CDN(args.url, args.keep, args.cookies, args.useragent, args.no_check_certificate)
+    cdn = CDN(args.url, args.keep, args.cookies, args.useragent, args.no_check_certificate, args.wait)
     cdn.link()
     cdn.js()
     cdn.style()
