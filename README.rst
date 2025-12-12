@@ -31,28 +31,28 @@ Usage:
 
     $ cdnparse -h
 
-        usage: cdnparse [-h] [-a] [-k] [-n] [-c COOKIES] [-u USERAGENT] [-l LOGFILE]
-                        [--version]
-                        url
+    usage: cdnparse [-h] [-a] [-k] [-n] [-c COOKIES] [-u USERAGENT] [-w WAIT] [-l LOGFILE] [--version] url
 
-        CDN gathering
+    CDN gathering
 
-        positional arguments:
-          url                   URL of website
+    positional arguments:
+      url                   URL of website
 
-        optional arguments:
-          -h, --help            show this help message and exit
-          -a, --all             include also local css/js
-          -k, --keep            keep the downloaded HTML file
-          -n, --no-check-certificate
-                                do not validate SSL certificates
-          -c COOKIES, --cookies COOKIES
-                                Cookiestring
-          -u USERAGENT, --useragent USERAGENT
-                                User Agent (default: Google Chrome)
-          -l LOGFILE, --logfile LOGFILE
-                                Name of the logfile (default: cdnparse.log)
-          --version             show program's version number and exit
+    options:
+      -h, --help            show this help message and exit
+      -a, --all             include also local css/js
+      -k, --keep            keep the downloaded HTML file
+      -n, --no-check-certificate
+                            do not validate SSL certificates
+      -c COOKIES, --cookies COOKIES
+                            Cookiestring
+      -u USERAGENT, --useragent USERAGENT
+                            User Agent (default: Google Chrome)
+      -w WAIT, --wait WAIT  wait SECONDS seconds between requests
+      -l LOGFILE, --logfile LOGFILE
+                            Name of the logfile (default: cdnparse.log)
+      --version             show program's version number and exit
+
 
 
 Together with wpull the output of the `cdnparse` command can be used to harvest

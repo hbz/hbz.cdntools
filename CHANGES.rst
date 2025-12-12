@@ -1,6 +1,13 @@
 Changelog
 =========
 
+hbz.cdntools 0.9 (2025-12-12)
+-----------------------------
+
+* added --wait parameter to slow down crawling
+* fiexed missing user agent string
+
+
 hbz.cdntools 0.8 (2025-10-08)
 -----------------------------
 
