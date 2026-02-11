@@ -78,6 +78,14 @@ class CDN:
         return all([result.scheme, result.netloc])
 
 
+    def is_data_url(self, url: str) -> bool:
+        """Return True if string is a Data URI
+        
+        Strings like "data:image/gif;base64,R0lGODlhA..." is not a downloadable image
+        """
+        return url.startswith("data:") and "," in url
+
+
     def extract_urls_from_css(self, css_address):
         """Return URL found in stylesheets
 
@@ -85,25 +93,30 @@ class CDN:
         we have to find them manually and put them in the cdn.txt
         """
         if not self.is_valid_url(css_address):
-            logger.warning(f"Invalid URL: {css_address}")
+            logger.warning(f"Invalid URL: {css_address} Skipping further URL extraction")
             return None
 
         response = requests.get(css_address, headers=self.headers, verify=self.ssl_verify)
         
         if response.status_code == 200:
+            logger.info(f"Fetching {css_address} for further URL extraction.")
             css_content = response.text
             # This regex matches URLs inside url() functions
             pattern = r'url\((.*?)\)'
-            urls = re.findall(pattern, css_content)
+            urls = re.findall(pattern, css_content)            
         else:
             logger.warning(f"Failed to retrieve the CSS file. Status code: {response.status_code}")
             urls = []
 
         for url in urls:
             url = url.strip('"\'')
+            fragment = url
+            logger.info("found %s in %s" % (fragment, css_address))
             if not self.is_valid_url(url):
-                url = urlunparse((self.scheme, self.netloc, url, '', '', ''))
-            if url not in  self.files:
+                #url = urlunparse((self.scheme, self.netloc, url, '', '', ''))
+                url = urljoin(css_address, fragment)
+            if url not in self.files and not self.is_data_url(url):
+                logger.info("added %s to cdn files" % url)
                 self.files.append(url)
 
     def _normalize(self, url):
@@ -259,14 +272,20 @@ if __name__ == '__main__':
     # url = "https://stadtarchivkoblenz.wordpress.com"
     # url = "https://www.vg-lingenfeld.de/vg_lingenfeld/Startseite/"
     # url = "https://www.languageatinternet.org/"
-    url = "https://www.xella.com/"
+    # url = "https://www.xella.com/"
+    url = "https://www.klimawandelvorsorge.de"
 
-    cdn = CDN(url, False, False, DEFAULT_USER_AGENT, False)
-    #cdin.link()
-    #cdn.js()
-    #cdn.style()
-    #cdn.hostame()
-    u = cdn.extract_urls_from_css("https://www.afrikanistik-aegyptologie-online.de/portal_css/DiPPThemeNG/ploneStyles5838.css")
-    print(u)
+    
+    cdn = CDN(url, False, False, DEFAULT_USER_AGENT, False, 0)
+    print(cdn.is_data_url('data:image/gif;base64,R0lGODlhAQABAPAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=='))
+    print(cdn.is_data_url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="50"/></svg>'))
+
+    """
+    cdn.link()
+    cdn.js()
+    cdn.style()
+    cdn.hostname()
     for file in cdn.files:
         print(file)
+    """
+
