@@ -1,4 +1,8 @@
 include *
+exclude cdnparse.log
+exclude cdn.txt
+exclude site.html
+exclude hostnames.txt
 
 global-exclude *pyc
 
