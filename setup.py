@@ -2,7 +2,7 @@
 
 from setuptools import setup, find_packages
 
-__version__ = "0.9"
+__version__ = "0.10"
 
 
 def _read(doc):

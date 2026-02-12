@@ -1,11 +1,18 @@
 Changelog
 =========
 
+hbz.cdntools 0.10 (2026-02-12)
+-----------------------------
+
+* fixed incorrectly constructed absolute URLs found in CSS files
+* ignore data URIs like "data:image/gif;base64,R0lGODlhA...".
+
+
 hbz.cdntools 0.9 (2025-12-12)
 -----------------------------
 
 * added --wait parameter to slow down crawling
-* fiexed missing user agent string
+* fixed missing user agent string
 
 
 hbz.cdntools 0.8 (2025-10-08)
