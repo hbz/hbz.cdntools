@@ -17,7 +17,7 @@ logger = logging.getLogger('cdnparse')
 IGNORE_RELS = ('dns-prefetch', 'preconnect', 'alternate', 'search', 'shortlink')
 DEFAULT_LOGFILE = "cdnparse.log"
 HOSTNAMES_FILE = "hostnames.txt"
-DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36"
+DEFAULT_USER_AGENT = "Mozilla/5.0 (compatible; to.science.bot +https://toscience.hbz-nrw.de/crawler)"
 SITE ="site.html"
 
 def rels_in_ignored_rels(rels):
